@@ -13,8 +13,15 @@ function love.load()
     score = 0
     -- Array para pegar outros elemetos do personagem/player
     player =  {}
+    
+    --Vida do player
+    player.hp = 10
     -- Velociadade do player
     player.Vel = 160    
+    --Intervalo de ataque do player
+    podeBater = true
+    player.cdMax = 1.2
+    player.cd = player.cdMax
     -- DECLARANDO A POSIÇÃO DO PLAYER NA TELA JOGO
     player.x = 150
     player.y = 400 
@@ -63,7 +70,11 @@ end
 
     
 function love.update(dt)
-    
+    --Temporizador de ataque do player 
+    player.cd = player.cd - (1*dt)
+    if player.cd < 0 then
+        podeBater = true
+    end
     if love.keyboard.isDown("q") then --Para Testes
         -- Chama o metodo de outro lugar
         enemySpawn()
@@ -79,8 +90,8 @@ end
 --persegue o player :D
 function fakeAI(dt)
     for i,v in ipairs(enemys) do
-        if player.x > v.x and playerColid(player.x,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false then 
-            distX = player.x - (v.x+55)
+        if player.x > v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
+            distX = player.x - (v.x-60)
             distY = player.y - (v.y)
             dist = math.sqrt(distX*distX+distY*distY)
             velX = distX/dist*v.vel
@@ -88,14 +99,19 @@ function fakeAI(dt)
             v.x = v.x + velX*dt
             v.y = v.y + velY*dt
         end
-        if player.x < v.x and playerColid(player.x,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false then 
-            distX = player.x - (v.x-55)
+        if player.x < v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
+            distX = player.x - (v.x+10)
             distY = player.y - (v.y)
             dist = math.sqrt(distX*distX+distY*distY)
             velX = distX/dist*v.vel
             velY = distY/dist*v.vel
             v.x = v.x + velX*dt
             v.y = v.y + velY*dt
+        end
+        if v.vida <= 0 then
+            v.vivo = false
+            table.remove(enemys,i)
+            score = score + 10
         end
     end
     
@@ -103,7 +119,8 @@ function fakeAI(dt)
     --Spawn
 function enemySpawn()
     local enemy = {}
-    
+    enemy.vivo = true
+    enemy.vida = 3
     enemy.x = 200
     enemy.y = 250
     enemy.w = 50
@@ -125,6 +142,7 @@ function love.draw()
     for i,v in ipairs(enemys) do 
         love.graphics.setColor(1,0,0)
         love.graphics.rectangle("fill",v.x,v.y,v.w,v.h)
+        love.graphics.setColor(1,1,1)
     end
     --  Chama o metodo de outro lugar
     spritesAnimation()
@@ -134,14 +152,14 @@ function love.draw()
     love.graphics.print("SCORE: " .. score, 10, 10)
     
     --Usar só para ver o range dos ataques
-    -- love.graphics.setColor(0,1,1)
-    -- if player.side == 1 then
-    -- love.graphics.rectangle("line",player.x-25,player.y+30,player.l/2,player.h/2)
-    -- end
-    -- if player.side == 2 then
-    -- love.graphics.rectangle("line",player.x+50,player.y+30,player.l/2,player.h/2)
-    -- end
-    
+    love.graphics.setColor(0,1,1)
+    if dLeft == true then
+     love.graphics.rectangle("line",player.x-192,player.y,player.w-16,player.h-60)
+     end
+   if dRight == true then
+     love.graphics.rectangle("line",player.x,player.y,player.w-16,player.h-60)
+     end
+     love.graphics.setColor(1,1,1)
 end
 
 -- CONTROLES
@@ -229,15 +247,22 @@ function movements(dt)
         end
         
     
-    -- Metodo para remover o inimigo
+    -- Metodo de ataque do player
     function weakAttack()
         for i,v in ipairs(enemys) do
-            if love.keyboard.isDown("e") and dRight == true and playerColid(player.x-25,player.y+30,player.w,player.h,v.x,v.y,v.h,v.w) then
-                table.remove(enemys,enemy) 
-                score = score + 1 
-            elseif love.keyboard.isDown("e") and dLeft == true and playerColid(player.x+50,player.y+30,player.w,player.h,v.x,v.y,v.h,v.w) then
-                table.remove(enemys,enemy) 
-                score = score + 1 
+            if love.keyboard.isDown("e") and dRight == true and podeBater == true then
+                if playerColid(player.x+96,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) == true then
+                    v.vida = v.vida - 3  
+                end
+                podeBater = false
+                player.cd = player.cdMax
+            end   
+            if love.keyboard.isDown("e") and dLeft == true and podeBater == true then  
+                if playerColid(player.x-192,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) == true then
+                    v.vida = v.vida - 3                  
+                end
+                podeBater = false
+                player.cd = player.cdMax
             end
         end
     end
@@ -266,13 +291,23 @@ function spritesAnimation()
     elseif player.direction == "stop" and dLeft == true then
         -- Sprite virada para esquerda
         animation.Stop:draw(images.player_stop, player.x, player.y, 0, -1, 1, 0, 0)
-    -- Casso o player ataque, ira acionar essa animação
-    elseif  player.direction == "weakAttackRight" and dRight == true then
+    -- Caso o player ataque, ira acionar essa animação
+    elseif  player.direction == "weakAttackRight" and dRight == true and podeBater == true then
         -- Sprite virada para direita
         animation.weakAttack:draw(images.player_weak_attack, player.x, player.y, 0, 1, 1, 90, 18)
-    elseif player.direction == "weakAttackLeft" and dLeft == true then
+    elseif player.direction == "weakAttackLeft" and dLeft == true and podeBater == true then
         -- Sprite virada para esquerda
         animation.weakAttack:draw(images.player_weak_attack, player.x, player.y, 0, -1, 1, 0, 18)
+
+        -- As animaçoes quando o player atacar e não poder bater
+    elseif  player.direction == "weakAttackRight" and dRight == true and podeBater == false then
+        -- Sprite virada para direita
+        animation.Stop:draw(images.player_stop, player.x, player.y, 0, 1, 1, 90, 0)
+    elseif player.direction == "weakAttackLeft" and dLeft == true and podeBater == false then
+        -- Sprite virada para esquerda
+        animation.Stop:draw(images.player_stop, player.x, player.y, 0, -1, 1, 0, 0)
+    
+
     end
     -- Controle de sprites do Player
     -- if enemy.direction == "right" then
