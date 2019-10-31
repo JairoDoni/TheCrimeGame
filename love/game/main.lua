@@ -20,7 +20,7 @@ function love.load()
     player.Vel = 160    
     --Intervalo de ataque do player
     podeBater = true
-    player.cdMax = 1.2
+    player.cdMax = 0
     player.cd = player.cdMax
     -- DECLARANDO A POSIÇÃO DO PLAYER NA TELA JOGO
     player.x = 150
@@ -91,7 +91,7 @@ end
 function fakeAI(dt)
     for i,v in ipairs(enemys) do
         if player.x > v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
-            distX = player.x - (v.x-60)
+            distX = (player.x - 96) - (v.x-60)
             distY = player.y - (v.y)
             dist = math.sqrt(distX*distX+distY*distY)
             velX = distX/dist*v.vel
@@ -100,7 +100,7 @@ function fakeAI(dt)
             v.y = v.y + velY*dt
         end
         if player.x < v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
-            distX = player.x - (v.x+10)
+            distX = (player.x - 96) - (v.x + 20)
             distY = player.y - (v.y)
             dist = math.sqrt(distX*distX+distY*distY)
             velX = distX/dist*v.vel
@@ -109,7 +109,7 @@ function fakeAI(dt)
             v.y = v.y + velY*dt
         end
         if v.vida <= 0 then
-            v.vivo = false
+            --v.vivo = false
             table.remove(enemys,i)
             score = score + 10
         end
@@ -236,7 +236,7 @@ function movements(dt)
     --Ataque do player
     -- Apertando "e" ele usa o ataque fraco
     -- Caso um inimigo esteja proximo ele executa o metodo para atacar e remover o inimigo
-        if love.keyboard.isDown("e") then
+        if love.keyboard.isDown("e") and podeBater == true then
             if dRight == true then
                 player.direction = "weakAttackRight"
             else
@@ -251,14 +251,14 @@ function movements(dt)
     function weakAttack()
         for i,v in ipairs(enemys) do
             if love.keyboard.isDown("e") and dRight == true and podeBater == true then
-                if playerColid(player.x+96,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) == true then
+                if playerColid(player.x,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) then
                     v.vida = v.vida - 3  
                 end
                 podeBater = false
                 player.cd = player.cdMax
             end   
             if love.keyboard.isDown("e") and dLeft == true and podeBater == true then  
-                if playerColid(player.x-192,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) == true then
+                if playerColid(player.x-192,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) then
                     v.vida = v.vida - 3                  
                 end
                 podeBater = false
@@ -292,22 +292,12 @@ function spritesAnimation()
         -- Sprite virada para esquerda
         animation.Stop:draw(images.player_stop, player.x, player.y, 0, -1, 1, 0, 0)
     -- Caso o player ataque, ira acionar essa animação
-    elseif  player.direction == "weakAttackRight" and dRight == true and podeBater == true then
+    elseif  player.direction == "weakAttackRight" and dRight == true then
         -- Sprite virada para direita
         animation.weakAttack:draw(images.player_weak_attack, player.x, player.y, 0, 1, 1, 90, 18)
-    elseif player.direction == "weakAttackLeft" and dLeft == true and podeBater == true then
+    elseif player.direction == "weakAttackLeft" and dLeft == true then
         -- Sprite virada para esquerda
         animation.weakAttack:draw(images.player_weak_attack, player.x, player.y, 0, -1, 1, 0, 18)
-
-        -- As animaçoes quando o player atacar e não poder bater
-    elseif  player.direction == "weakAttackRight" and dRight == true and podeBater == false then
-        -- Sprite virada para direita
-        animation.Stop:draw(images.player_stop, player.x, player.y, 0, 1, 1, 90, 0)
-    elseif player.direction == "weakAttackLeft" and dLeft == true and podeBater == false then
-        -- Sprite virada para esquerda
-        animation.Stop:draw(images.player_stop, player.x, player.y, 0, -1, 1, 0, 0)
-    
-
     end
     -- Controle de sprites do Player
     -- if enemy.direction == "right" then
