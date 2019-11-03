@@ -37,6 +37,7 @@ function love.load()
     dLeft = false
     --Um Array de inimigos
     enemys = {}
+    enemySpawn(2, 300,400,300)
     -- enemys.direction = "right"
     -- Array(lista) para as imagens
     images = {}
@@ -80,6 +81,7 @@ function love.update(dt)
         -- Chama o metodo de outro lugar
         enemySpawn(2, 300,400)
     end
+    
     -- Chama o metodo de outro lugar
     fakeAI(dt)
     -- Chama o metodo de outro lugar
@@ -120,58 +122,64 @@ function fakeAI(dt)
     --Spawn
 function enemySpawn(enemyType , enemyX , enemyY)
     --enemy type 1: Capangas Verdes, 2:Capanga Amarelos, 3: Capangas Vermelhos, 4: Boss
-    if(enemyType == 1) then
-        local enemy = {}
-        enemy.cd = 1
-        enemy.dano = 1
-        enemy.vivo = true
-        enemy.vida = 3
-        enemy.x = enemyX
-        enemy.y = enemyY
-        enemy.w = 50
-        enemy.h = 100
-        enemy.vel = 80
-        table.insert(enemys,enemy)
-    end
-    if(enemyType == 2) then
-        local enemy = {}
-        enemy.cd = 1
-        enemy.dano = 1
-        enemy.vivo = true
-        enemy.vida = 6
-        enemy.x = enemyX
-        enemy.y = enemyY
-        enemy.w = 50
-        enemy.h = 100
-        enemy.vel = 80
-        table.insert(enemys,enemy)
+   -- if(player.x < spawnX)then
+        if(enemyType == 1) then
+            local enemy = {}
+            enemy.type = 1
+            enemy.cd = 1
+            enemy.dano = 1
+            enemy.vivo = true
+            enemy.vida = 3
+            enemy.x = enemyX
+            enemy.y = enemyY
+            enemy.w = 50
+            enemy.h = 100
+            enemy.vel = 80
+            table.insert(enemys,enemy)
         end
-    if(enemyType == 3) then
-        local enemy = {}
-        enemy.cd = 1
-        enemy.dano = 1
-        enemy.vivo = true
-        enemy.vida = 9
-        enemy.x = enemyX
-        enemy.y = enemyY
-        enemy.w = 50
-        enemy.h = 100
-        enemy.vel = 90
-        table.insert(enemys,enemy)
-    end 
-    if(enemyType == 4) then
-        local enemy = {}
-        enemy.cd = 1
-        enemy.dano = 1
-        enemy.vivo = true
-        enemy.vida = 60
-        enemy.x = enemyX
-        enemy.y = enemyY
-        enemy.w = 50
-        enemy.h = 100
-        enemy.vel = 80
-        table.insert(enemys,enemy)
-    end 
+        if(enemyType == 2) then
+            local enemy = {}
+            enemy.type = 2
+            enemy.cd = 1
+            enemy.dano = 1
+            enemy.vivo = true
+            enemy.vida = 6
+            enemy.x = enemyX
+            enemy.y = enemyY
+            enemy.w = 50
+            enemy.h = 100
+            enemy.vel = 80
+            table.insert(enemys,enemy)
+            end
+        if(enemyType == 3) then
+            local enemy = {}
+            enemy.type = 3
+            enemy.cd = 1
+            enemy.dano = 1
+            enemy.vivo = true
+            enemy.vida = 9
+            enemy.x = enemyX
+            enemy.y = enemyY
+            enemy.w = 50
+            enemy.h = 100
+            enemy.vel = 90
+            table.insert(enemys,enemy)
+        end 
+        if(enemyType == 4) then
+            local enemy = {}
+            enemy.type = 4
+            enemy.cd = 1
+            enemy.dano = 1
+            enemy.vivo = true
+            enemy.vida = 60
+            enemy.x = enemyX
+            enemy.y = enemyY
+            enemy.w = 50
+            enemy.h = 100
+            enemy.vel = 80
+            table.insert(enemys,enemy)
+        end 
+    --end
 end
 
 function love.draw()
@@ -195,7 +203,8 @@ function love.draw()
     love.graphics.setFont(fonts.large)
     --mostra a pontuação do jogo
     love.graphics.print("SCORE: " .. score, 10, 10)
-    
+    love.graphics.print("X= " .. player.x, 28,23)
+   
     --Usar só para ver o range dos ataques
     love.graphics.setColor(0,1,1)
     if dLeft == true then
