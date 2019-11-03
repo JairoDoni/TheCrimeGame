@@ -7,12 +7,14 @@ local anim = require("lib/anim8")
 local animation ,images
 
 function love.load()
+
+
     -- O mouse não aparece dentro da janela
     love.mouse.setVisible(false)
     -- Pontuação de inimigos mortos
     score = 0
     -- Array para pegar outros elemetos do personagem/player
-    player =  {}
+    player =  {}    
     
     --Vida do player
     player.hp = 10
@@ -20,7 +22,7 @@ function love.load()
     player.Vel = 160    
     --Intervalo de ataque do player
     podeBater = true
-    player.cdMax = 0
+    player.cdMax = 0.2
     player.cd = player.cdMax
     -- DECLARANDO A POSIÇÃO DO PLAYER NA TELA JOGO
     player.x = 150
@@ -36,7 +38,6 @@ function love.load()
     --Um Array de inimigos
     enemys = {}
     -- enemys.direction = "right"
-    
     -- Array(lista) para as imagens
     images = {}
     animation= {}
@@ -77,7 +78,7 @@ function love.update(dt)
     end
     if love.keyboard.isDown("q") then --Para Testes
         -- Chama o metodo de outro lugar
-        enemySpawn()
+        enemySpawn(2, 300,400)
     end
     -- Chama o metodo de outro lugar
     fakeAI(dt)
@@ -117,16 +118,60 @@ function fakeAI(dt)
     
     end
     --Spawn
-function enemySpawn()
-    local enemy = {}
-    enemy.vivo = true
-    enemy.vida = 3
-    enemy.x = 200
-    enemy.y = 250
-    enemy.w = 50
-    enemy.h = 100
-    enemy.vel = 80
-    table.insert(enemys,enemy)
+function enemySpawn(enemyType , enemyX , enemyY)
+    --enemy type 1: Capangas Verdes, 2:Capanga Amarelos, 3: Capangas Vermelhos, 4: Boss
+    if(enemyType == 1) then
+        local enemy = {}
+        enemy.cd = 1
+        enemy.dano = 1
+        enemy.vivo = true
+        enemy.vida = 3
+        enemy.x = enemyX
+        enemy.y = enemyY
+        enemy.w = 50
+        enemy.h = 100
+        enemy.vel = 80
+        table.insert(enemys,enemy)
+    end
+    if(enemyType == 2) then
+        local enemy = {}
+        enemy.cd = 1
+        enemy.dano = 1
+        enemy.vivo = true
+        enemy.vida = 6
+        enemy.x = enemyX
+        enemy.y = enemyY
+        enemy.w = 50
+        enemy.h = 100
+        enemy.vel = 80
+        table.insert(enemys,enemy)
+        end
+    if(enemyType == 3) then
+        local enemy = {}
+        enemy.cd = 1
+        enemy.dano = 1
+        enemy.vivo = true
+        enemy.vida = 9
+        enemy.x = enemyX
+        enemy.y = enemyY
+        enemy.w = 50
+        enemy.h = 100
+        enemy.vel = 90
+        table.insert(enemys,enemy)
+    end 
+    if(enemyType == 4) then
+        local enemy = {}
+        enemy.cd = 1
+        enemy.dano = 1
+        enemy.vivo = true
+        enemy.vida = 60
+        enemy.x = enemyX
+        enemy.y = enemyY
+        enemy.w = 50
+        enemy.h = 100
+        enemy.vel = 80
+        table.insert(enemys,enemy)
+    end 
 end
 
 function love.draw()
