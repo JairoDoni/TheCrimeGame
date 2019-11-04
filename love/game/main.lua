@@ -22,8 +22,7 @@ function love.load()
     player.Vel = 160    
     --Intervalo de ataque do player
     podeBater = true
-    player.cdMax = 0.2
-    player.cd = player.cdMax
+    player.cdMax = 1
     -- DECLARANDO A POSIÇÃO DO PLAYER NA TELA JOGO
     player.x = 150
     player.y = 400 
@@ -73,22 +72,26 @@ end
     
 function love.update(dt)
     --Temporizador de ataque do player 
-    player.cd = player.cd - (1*dt)
-    if player.cd < 0 then
+    player.cdMax = player.cdMax - dt
+    if player.cdMax < 0 then
         podeBater = true
+        player.cdMax = player.cdMax + 1 
     end
     if love.keyboard.isDown("q") then --Para Testes
         -- Chama o metodo de outro lugar
         enemySpawn(2, 300,400)
     end
+    for i,v in ipairs(enemys) do 
+        
+        v.cdmax = v.cdmax - dt
+        if v.cdmax < 0 then
+            v.atacando = true
+            v.cdmax = v.cdmax + 1
+        end
+        
+    end
     
     -- Chama o metodo de outro lugar
-  --  for i,v in ipairs(enemys) do 
-   -- v.cd = v.cd - (1*dt)
-    --    if v.cd < 0 then
-     --       v.atacando = true
-    --    end
-    end
     fakeAI(dt)
     -- Chama o metodo de outro lugar
     movements(dt)
@@ -121,7 +124,7 @@ function love.draw()
     --Usar só para ver o range dos ataques
     love.graphics.setColor(0,1,1)
     if dLeft == true then
-     love.graphics.rectangle("line",player.x-192,player.y,player.w-16,player.h-60)
+     love.graphics.rectangle("line",player.x-160,player.y,player.w-16,player.h-60)
      end
    if dRight == true then
      love.graphics.rectangle("line",player.x,player.y,player.w-16,player.h-60)
@@ -141,7 +144,7 @@ function fakeAI(dt)
             velY = distY/dist*v.vel
             v.x = v.x + velX*dt
             v.y = v.y + velY*dt
-        end
+        end 
         if player.x < v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
             distX = (player.x - 96) - (v.x + 20)
             distY = player.y - (v.y)
@@ -158,9 +161,9 @@ function fakeAI(dt)
         end
 
         --Ataque dos inimigos
-        if playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) then
-            player.hp = player.hp - v.dano
+        if playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) and v.atacando == true then
             v.atacando = false
+            player.hp = player.hp - v.dano
         end
 
     end
@@ -175,7 +178,6 @@ function enemySpawn(enemyType , enemyX , enemyY)
             local enemy = {}
             enemy.atacando = true
             enemy.type = 1
-            enemy.cd = enemy.cdmax
             enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
@@ -191,7 +193,6 @@ function enemySpawn(enemyType , enemyX , enemyY)
             local enemy = {}
             enemy.atacando = true
             enemy.type = 2
-            enemy.cd = enemy.cdmax
             enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
@@ -207,7 +208,6 @@ function enemySpawn(enemyType , enemyX , enemyY)
             local enemy = {}
             enemy.atacando = true
             enemy.type = 3
-            enemy.cd = enemy.cdmax
             enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
@@ -223,7 +223,6 @@ function enemySpawn(enemyType , enemyX , enemyY)
             local enemy = {}
             enemy.atacando = true
             enemy.type = 4
-            enemy.cd = enemy.cdmax
             enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
@@ -331,19 +330,17 @@ function movements(dt)
                     v.vida = v.vida - 3  
                 end
                 podeBater = false
-                player.cd = player.cdMax
             end   
             if love.keyboard.isDown("e") and dLeft == true and podeBater == true then  
-                if playerColid(player.x-192,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) then
+                if playerColid(player.x-160,player.y,player.w-16,player.h-60,v.x,v.y,v.h,v.w) then
                     v.vida = v.vida - 3                  
                 end
                 podeBater = false
-                player.cd = player.cdMax
             end
         end
     end
 
-end
+end 
 
 -- Animação das sprites onde tambem manipula a direção em que o personagem esta.
 function spritesAnimation()
