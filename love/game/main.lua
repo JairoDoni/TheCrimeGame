@@ -37,7 +37,7 @@ function love.load()
     dLeft = false
     --Um Array de inimigos
     enemys = {}
-    enemySpawn(2, 300,400,300)
+    enemySpawn(2, 500,400,300)
     -- enemys.direction = "right"
     -- Array(lista) para as imagens
     images = {}
@@ -83,16 +83,56 @@ function love.update(dt)
     end
     
     -- Chama o metodo de outro lugar
+    for i,v in ipairs(enemys) do 
+    v.cd = v.cd - (1*dt)
+        if v.cd < 0 then
+            v.atacando = true
+        end
+    end
     fakeAI(dt)
     -- Chama o metodo de outro lugar
     movements(dt)
 end
     
+
+function love.draw()
+    -- Fundo/Cenario
+    for x=0, love.graphics.getWidth(), images.background:getWidth() do
+        for y=0, love.graphics.getHeight(), images.background:getHeight() do
+            love.graphics.draw(images.background, x, y)
+        end
+    end
     
     
+    -- Inimigos
+    for i,v in ipairs(enemys) do 
+        love.graphics.setColor(1,0,0)
+        love.graphics.rectangle("fill",v.x,v.y,v.w,v.h)
+        love.graphics.setColor(1,1,1)
+    end
+    --  Chama o metodo de outro lugar
+    spritesAnimation()
+
+    love.graphics.setFont(fonts.large)
+    --mostra a pontuação do jogo
+    love.graphics.print("SCORE: " .. score, 10, 10)
+    love.graphics.print("HP= " .. player.hp,10,40)
+   
+    --Usar só para ver o range dos ataques
+    love.graphics.setColor(0,1,1)
+    if dLeft == true then
+     love.graphics.rectangle("line",player.x-192,player.y,player.w-16,player.h-60)
+     end
+   if dRight == true then
+     love.graphics.rectangle("line",player.x,player.y,player.w-16,player.h-60)
+     end
+     love.graphics.setColor(1,1,1)
+end
+
 --persegue o player :D
 function fakeAI(dt)
     for i,v in ipairs(enemys) do
+
         if player.x > v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
             distX = (player.x - 96) - (v.x-60)
             distY = player.y - (v.y)
@@ -116,17 +156,27 @@ function fakeAI(dt)
             table.remove(enemys,i)
             score = score + 10
         end
+
+        --Ataque dos inimigos
+        if playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) then
+            player.hp = player.hp - v.dano
+            v.atacando = false
+        end
+
     end
     
-    end
+end
+
     --Spawn
 function enemySpawn(enemyType , enemyX , enemyY)
     --enemy type 1: Capangas Verdes, 2:Capanga Amarelos, 3: Capangas Vermelhos, 4: Boss
    -- if(player.x < spawnX)then
         if(enemyType == 1) then
             local enemy = {}
+            enemy.atacando = true
             enemy.type = 1
-            enemy.cd = 1
+            enemy.cd = enemy.cdmax
+            enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
             enemy.vida = 3
@@ -139,8 +189,10 @@ function enemySpawn(enemyType , enemyX , enemyY)
         end
         if(enemyType == 2) then
             local enemy = {}
+            enemy.atacando = true
             enemy.type = 2
-            enemy.cd = 1
+            enemy.cd = enemy.cdmax
+            enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
             enemy.vida = 6
@@ -153,8 +205,10 @@ function enemySpawn(enemyType , enemyX , enemyY)
             end
         if(enemyType == 3) then
             local enemy = {}
+            enemy.atacando = true
             enemy.type = 3
-            enemy.cd = 1
+            enemy.cd = enemy.cdmax
+            enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
             enemy.vida = 9
@@ -167,8 +221,10 @@ function enemySpawn(enemyType , enemyX , enemyY)
         end 
         if(enemyType == 4) then
             local enemy = {}
+            enemy.atacando = true
             enemy.type = 4
-            enemy.cd = 1
+            enemy.cd = enemy.cdmax
+            enemy.cdmax = 1
             enemy.dano = 1
             enemy.vivo = true
             enemy.vida = 60
@@ -180,40 +236,6 @@ function enemySpawn(enemyType , enemyX , enemyY)
             table.insert(enemys,enemy)
         end 
     --end
-end
-
-function love.draw()
-    -- Fundo/Cenario
-    for x=0, love.graphics.getWidth(), images.background:getWidth() do
-        for y=0, love.graphics.getHeight(), images.background:getHeight() do
-            love.graphics.draw(images.background, x, y)
-        end
-    end
-    
-    
-    -- Inimigos
-    for i,v in ipairs(enemys) do 
-        love.graphics.setColor(1,0,0)
-        love.graphics.rectangle("fill",v.x,v.y,v.w,v.h)
-        love.graphics.setColor(1,1,1)
-    end
-    --  Chama o metodo de outro lugar
-    spritesAnimation()
-
-    love.graphics.setFont(fonts.large)
-    --mostra a pontuação do jogo
-    love.graphics.print("SCORE: " .. score, 10, 10)
-    love.graphics.print("X= " .. player.x, 28,23)
-   
-    --Usar só para ver o range dos ataques
-    love.graphics.setColor(0,1,1)
-    if dLeft == true then
-     love.graphics.rectangle("line",player.x-192,player.y,player.w-16,player.h-60)
-     end
-   if dRight == true then
-     love.graphics.rectangle("line",player.x,player.y,player.w-16,player.h-60)
-     end
-     love.graphics.setColor(1,1,1)
 end
 
 -- CONTROLES
