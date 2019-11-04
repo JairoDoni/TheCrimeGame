@@ -532,9 +532,7 @@ function playerColid(x1, y1, w1, h1, x2, y2, h2, w2)
 end
     
 function SpawnList()
-enemySpawn(2, 1200,400)    
     
-
 end
     
     
