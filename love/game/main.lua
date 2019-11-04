@@ -36,7 +36,7 @@ function love.load()
     dLeft = false
     --Um Array de inimigos
     enemys = {}
-    enemySpawn(2, 500,400,300)
+    enemySpawn(2, 1200,400)
     -- enemys.direction = "right"
     -- Array(lista) para as imagens
     images = {}
@@ -120,54 +120,55 @@ function love.draw()
     --mostra a pontuação do jogo
     love.graphics.print("SCORE: " .. score, 10, 10)
     love.graphics.print("HP= " .. player.hp,10,40)
-   
+    love.graphics.print("Teste " .. distxt,10, 80 )
     --Usar só para ver o range dos ataques
-    love.graphics.setColor(0,1,1)
-    if dLeft == true then
-     love.graphics.rectangle("line",player.x-160,player.y,player.w-16,player.h-60)
-     end
-   if dRight == true then
-     love.graphics.rectangle("line",player.x,player.y,player.w-16,player.h-60)
-     end
-     love.graphics.setColor(1,1,1)
+   -- love.graphics.setColor(0,1,1)
+    --if dLeft == true then
+     --love.graphics.rectangle("line",player.x-160,player.y,player.w-16,player.h-60)
+     --end
+   --if dRight == true then
+     --love.graphics.rectangle("line",player.x,player.y,player.w-16,player.h-60)
+     --end
+     --love.graphics.setColor(1,1,1)
 end
 
 --persegue o player :D
 function fakeAI(dt)
     for i,v in ipairs(enemys) do
+        distxt = player.x - v.x
+        if distxt >= -600 and distxt <= 600 then
+            if player.x > v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
+                distX = (player.x - 96) - (v.x-60)
+                distY = player.y - (v.y)
+                dist = math.sqrt(distX*distX+distY*distY)
+                velX = distX/dist*v.vel
+                velY = distY/dist*v.vel
+                v.x = v.x + velX*dt
+                v.y = v.y + velY*dt
+            end 
+            if player.x < v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
+                distX = (player.x - 96) - (v.x + 20)
+                distY = player.y - (v.y)
+                dist = math.sqrt(distX*distX+distY*distY)
+                velX = distX/dist*v.vel
+                velY = distY/dist*v.vel
+                v.x = v.x + velX*dt
+                v.y = v.y + velY*dt
+            end
+            if v.vida <= 0 then
+                --v.vivo = false
+                table.remove(enemys,i)
+                score = score + 10
+            end
 
-        if player.x > v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
-            distX = (player.x - 96) - (v.x-60)
-            distY = player.y - (v.y)
-            dist = math.sqrt(distX*distX+distY*distY)
-            velX = distX/dist*v.vel
-            velY = distY/dist*v.vel
-            v.x = v.x + velX*dt
-            v.y = v.y + velY*dt
-        end 
-        if player.x < v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
-            distX = (player.x - 96) - (v.x + 20)
-            distY = player.y - (v.y)
-            dist = math.sqrt(distX*distX+distY*distY)
-            velX = distX/dist*v.vel
-            velY = distY/dist*v.vel
-            v.x = v.x + velX*dt
-            v.y = v.y + velY*dt
-        end
-        if v.vida <= 0 then
-            --v.vivo = false
-            table.remove(enemys,i)
-            score = score + 10
-        end
+            --Ataque dos inimigos
+            if playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) and v.atacando == true then
+                v.atacando = false
+                player.hp = player.hp - v.dano
+            end
 
-        --Ataque dos inimigos
-        if playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) and v.atacando == true then
-            v.atacando = false
-            player.hp = player.hp - v.dano
         end
-
     end
-    
 end
 
     --Spawn
