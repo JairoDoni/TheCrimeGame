@@ -32,11 +32,11 @@ function love.load()
     -- Instacia que manipula o lado das a sprites ser utilisado
     player.direction = "stop"
     -- Variaveis para guardar a ultima direção que o player esteve
-    dRight = true
+    dRight = true   
     dLeft = false
     --Um Array de inimigos
     enemys = {}
-    enemySpawn(2, 1200,400)
+    SpawnList()
     -- enemys.direction = "right"
     -- Array(lista) para as imagens
     images = {}
@@ -120,7 +120,6 @@ function love.draw()
     --mostra a pontuação do jogo
     love.graphics.print("SCORE: " .. score, 10, 10)
     love.graphics.print("HP= " .. player.hp,10,40)
-    love.graphics.print("Teste " .. distxt,10, 80 )
     --Usar só para ver o range dos ataques
    -- love.graphics.setColor(0,1,1)
     --if dLeft == true then
@@ -136,7 +135,7 @@ end
 function fakeAI(dt)
     for i,v in ipairs(enemys) do
         distxt = player.x - v.x
-        if distxt >= -600 and distxt <= 600 then
+        if distxt >= -800 and distxt <= 800 then
             if player.x > v.x and playerColid(player.x-96,player.y,player.w,player.h,v.x,v.y,v.h,v.w) == false and v.vivo == true then 
                 distX = (player.x - 96) - (v.x-60)
                 distY = player.y - (v.y)
@@ -388,6 +387,10 @@ function playerColid(x1, y1, w1, h1, x2, y2, h2, w2)
             y1 + h1 > y2
 end
     
+function SpawnList()
+enemySpawn(2, 1200,400)    
     
+
+end
     
     
