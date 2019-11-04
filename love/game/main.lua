@@ -83,11 +83,11 @@ function love.update(dt)
     end
     
     -- Chama o metodo de outro lugar
-    for i,v in ipairs(enemys) do 
-    v.cd = v.cd - (1*dt)
-        if v.cd < 0 then
-            v.atacando = true
-        end
+  --  for i,v in ipairs(enemys) do 
+   -- v.cd = v.cd - (1*dt)
+    --    if v.cd < 0 then
+     --       v.atacando = true
+    --    end
     end
     fakeAI(dt)
     -- Chama o metodo de outro lugar
